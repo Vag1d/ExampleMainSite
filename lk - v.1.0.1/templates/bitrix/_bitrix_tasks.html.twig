@@ -1,0 +1,50 @@
+<button type="button" class="btn btn-primary" id="bitrix_task_create" token="{{ csrf_token('bitrix-add-task' ~ num_contract) }}">Создать задачу</button>
+{% if bitrix is defined and bitrix.data is not null %}
+    <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th class="th-sm">№</th>
+                <th class="th-sm">Название</th>
+                <th class="th-sm">Дата создания</th>
+                <th class="th-sm">Крайний срок</th>
+                <th class="th-sm">Статус</th>
+            </tr>
+        </thead>
+        <tbody id="bitrix_table_body">
+            {% for task in bitrix.data %}
+                {% include 'bitrix/_bitrix_task.html.twig' %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    {% if error is defined %}
+        <b>{{ error }}
+    {% else %}
+        <b>Нет задач на этого абонента!</b>
+    {% endif %}
+{% endif %}
+
+{% if generate_script %}
+    <script>
+        $(document).ready(function(){
+            $('#bitrix_data').on('click', 'button', function() {
+                var bitrix_button = $(this);
+                bitrix_button.after('<img id="bitrix_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}">');
+                var bitrixTimer = Date.now();
+                if ($('#bitrix_data').children('table').length === 0) {
+                    loadService("{{ path('ajax_bitrix_task_create') }}", {"num_contract" : "{{ num_contract }}", "token" : bitrix_button.attr("token"), "generate_table": true}, function (data) { // Bitrix create first task
+                        $('#bitrix_ajax_icon').remove();
+                        $("#bitrix_data").html(data.content).prepend('<p class="font-italic"><small>Добавлено за ' + (Date.now() - bitrixTimer) / 1000 + ' секунд.</small></p>');
+                    });
+                } else {
+                    loadService("{{ path('ajax_bitrix_task_create') }}", {"num_contract" : "{{ num_contract }}", "token" : bitrix_button.attr("token")}, function (data) { // Bitrix create task
+                        $('#bitrix_ajax_icon').remove();
+                        $("#bitrix_table_body").prepend(data.content);
+                        $("#bitrix_data").children('p').first().remove();
+                        $("#bitrix_data").prepend('<p class="font-italic"><small>Добавлено за ' + (Date.now() - bitrixTimer) / 1000 + ' секунд.</small></p>');
+                    });
+                }
+            });
+        });
+    </script>
+{% endif %}

@@ -1,0 +1,15 @@
+# index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+
+# TestTable:
+#   path: /table
+#   controller: App\Controller\MainController::table
+#
+# TestTable2:
+#   path: /table_test
+#   controller: App\Controller\MainController::table_test
+#
+logout:
+  path: /logout

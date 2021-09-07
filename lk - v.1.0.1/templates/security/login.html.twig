@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="https://raw.githubusercontent.com/dukei/any-balance-providers/9a275900b25bed8213310ed5289d5d3d1a9189f7/providers/ab-internet-ellcom/icon.png">
+
+    <title>Вход</title>
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+            {{ encore_entry_link_tags('login') }}
+        {% endblock %}
+        <meta charset="utf-8">
+</head>
+
+<body class="fixed-sn mdb-skin-custom" data-spy="scroll" data-target="#scrollspy" data-offset="15">
+
+    <div class="container">
+    	<div class="d-flex justify-content-center h-100">
+    		<div class="card">
+    			<div class="card-header">
+    				<h3>Вход</h3>
+    			</div>
+    			<div class="card-body">
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+    				<form action="{{ path('login') }}" method="post">
+    					<div class="input-group form-group">
+    						<div class="input-group-prepend">
+    							<span class="input-group-text"><i class="fas fa-user"></i></span>
+    						</div>
+    						<input type="text" class="form-control" placeholder="Логин" id="username" name="_username" value="{{ last_username }}">
+
+    					</div>
+    					<div class="input-group form-group">
+    						<div class="input-group-prepend">
+    							<span class="input-group-text"><i class="fas fa-key"></i></span>
+    						</div>
+    						<input type="password" class="form-control" placeholder="Пароль" id="password" name="_password">
+    					</div>
+    					<!-- <div class="row align-items-center remember">
+    						<input type="checkbox">Запомнить меня
+    					</div> -->
+    					<div class="form-group">
+    						<input type="submit" value="Войти" class="btn float-right login_btn">
+    					</div>
+    				</form>
+    			</div>
+    			<!-- <div class="card-footer">
+    				<div class="d-flex justify-content-center links">
+    					Don't have an account?<a href="#">Sign Up</a>
+    				</div>
+    				<div class="d-flex justify-content-center">
+    					<a href="#">Forgot your password?</a>
+    				</div>
+    			</div> -->
+    		</div>
+    	</div>
+    </div>
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+</body>
+</html>

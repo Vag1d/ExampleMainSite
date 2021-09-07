@@ -1,0 +1,32 @@
+<tr>
+    <td>{{ task.id }}</td>
+    <td><a href='https://192.168.117.56/company/personal/user/{{ task.createdBy }}/tasks/task/view/{{ task.id }}/' target='_blank'>{{ task.title }}</a></td>
+    <td>{{ task.createdDate|date('d.m.Y H:i:s') }}</td>
+    <td>{{ task.deadline|date('d.m.Y H:i:s') }}</td>
+    <td>
+        {% if task.status == 1 %}
+            Новая
+        {% elseif task.status == 2 %}
+            Ждет выполнения
+        {% elseif task.status == 3 %}
+            Выполняется
+        {% elseif task.status == 4 %}
+            Предположительно завершена
+        {% elseif task.status == 5 %}
+            Завершена
+        {% elseif task.status == 6 %}
+            Отложена
+        {% elseif task.status == 7 %}
+            Отказался
+        {% endif %}
+        {% if task.subStatus is defined %}
+            {% if task.subStatus == -1 %}
+                (просрочена)
+            {% elseif task.subStatus == -2 %}
+                (не просмотрена)
+            {% elseif task.subStatus == -3 %}
+                (почти просрочена)
+            {% endif %}
+        {% endif %}
+    </td>
+</tr>

@@ -1,0 +1,61 @@
+{% if billing_info is defined and billing_info is not null %}
+<table id="dtBasicExample-1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <tbody>
+        <tr>
+            <td>Номер договора</td>
+            <td> {{ billing_info.title }} </td>
+        </tr>
+        <tr>
+            <td>ФИО</td>
+            <td> {{ billing_info.comment }} </td>
+        </tr>
+        <tr>
+            <td>Баланс</td>
+            <td> {{ billing_info.balance }} </td>
+        </tr>
+        <tr>
+            <td>Тариф</td>
+            {% for tarif in billing_info.tariffList %}
+            <td> {{ tarif }} </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td>Представитель</td>
+            <td> {{ billing_info.agent }} </td>
+        </tr>
+    <table id="dtBasicExample-1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+        <tr>
+            <th class="th-sm"> Логин </th>
+            <th class="th-sm"> Окато/Порт </th>
+            <th class="th-sm"> Мак Адрес </th>
+            <th class="th-sm"> Статус </th>
+        </thead>
+        <tbody>
+        {% for info in billing_info.inetServiceList %}
+            <tr>
+                <td> {{ info.login }}      </td>
+                <td> {{ info.identifier }} </td>
+                <td> {{ info.macAddress }} </td>
+                <td>
+                    {% if info.status == 0 %}
+                        Активный
+                    {% elseif info.status == 1 %}
+                        Закрытый
+                    {% elseif info.status == 2 %}
+                        Заблокированный
+                    {% endif %}
+                </td>
+                </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </tbody>
+</table>
+{% else %}
+    {% if error is defined %}
+        <b>{{ error }}</b>
+    {% else %}
+        <b>Договор не найден!</b>
+    {% endif %}
+{% endif %}

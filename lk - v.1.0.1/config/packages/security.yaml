@@ -1,0 +1,43 @@
+security:
+    providers:
+        db:
+            entity:
+                class: App\Entity\User
+                property: username
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: true
+            provider: db
+            form_login:
+                login_path: login
+                check_path: login
+                default_target_path: /abonent_info/
+                always_use_default_target_path: false
+
+            logout:
+                path: /logout
+                target: /
+
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+
+    access_control:
+#        - { path: ^/user/app.user.id/edit, roles: ROLE_USER }
+        - { path: ^/user/self_edit, roles: ROLE_USER }
+        - { path: ^/user/get_billing_token, roles: ROLE_BILLING_AUTH }
+        - { path: ^/user, roles: ROLE_SUPER_ADMIN }
+#        - { path: ^/abonent_info/1, roles: ROLE_USER}
+        - { path: ^/interactive_log, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, roles: ROLE_USER }
+
+    role_hierarchy:
+        ROLE_ADMIN:         ROLE_USER
+        ROLE_CALLCENTER:    ROLE_USER
+        ROLE_ENGINEER:      ROLE_USER
+        ROLE_SUPER_ADMIN:   ROLE_ADMIN

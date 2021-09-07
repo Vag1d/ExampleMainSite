@@ -1,0 +1,27 @@
+{% if zabbix_data is defined and zabbix_data is not null %}
+    <b>Окато: </b>{{ zabbix_data.ocato }} ({% if zabbix_data.items.host_status.lastvalue == 1 %}Онлайн, задержка {{ zabbix_data.items.delay.lastvalue}} мс{% else %} Оффлайн {% endif %})<br>
+    <b>Список интерфейсов:</b>
+    <ul>
+        {% for interface in zabbix_data.interfaces %}
+            <li><a href="telnet://{{ interface.ip }}">{{ interface.ip }}</a></li>
+        {% endfor %}
+    </ul>
+    <b>Карты сетей:</b>
+    <ul>
+        {% for map_name in zabbix_data.maps %}
+            <li>{{ map_name }}</li>
+        {% endfor %}
+    </ul>
+    <script>
+        $("#zabbix_hoststatus_graph").html("<img src='data:image/png;base64,{{ zabbix_data.items.host_status.graphdata }}'>");
+        $("#zabbix_delay_graph").html("<img src='data:image/png;base64,{{ zabbix_data.items.delay.graphdata }}'>");
+    </script>
+    <div id="zabbix_hoststatus_graph"></div>
+    <div id="zabbix_delay_graph"></div>
+{% else %}
+    {% if error is defined %}
+        <b>{{ error }}
+    {% else %}
+        <b>Ничего не найдено!</b>
+    {% endif %}
+{% endif %}

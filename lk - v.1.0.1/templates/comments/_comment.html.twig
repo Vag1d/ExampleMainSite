@@ -1,0 +1,13 @@
+<div class="card">
+  <div class="card-header">
+    {{ comment.author.username }}
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ comment.createdAt|date("d.m.Y H:i:s") }}</h5>
+    <p class="card-text">{{ comment.text }}</p>
+    {% if comment.author.id == user.id or is_granted('ROLE_ADMIN') %}
+        <button class="btn btn-primary comment-delete" comment_id="{{ comment.id }}" token="{{ csrf_token('remove-comment' ~ comment.id ~ num_contract) }}">Удалить</button>
+    {% endif %}
+  </div>
+</div>
+<br>

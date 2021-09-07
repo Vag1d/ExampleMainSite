@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    {{ encore_entry_script_tags('self_settings') }}
+
+{% endblock %}
+
+{% block title %}Ваш профиль{% endblock %}
+
+{% block body %}
+    <main>
+        <h1>Ваш профиль</h1>
+
+        {{ form_start(form) }}
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+        {{ form_row(form.username, {'attr': {'readonly': 'readonly'}}) }}
+        {{ form_row(form.password) }}
+        {% if is_granted('ROLE_BILLING_AUTH') %}
+            <div class="form-group">
+                <h3>Биллинг</h3>
+            {% if user.billingToken is not null %}
+                <span id="billing_access_info"><i class="fas fa-circle text-success"></i> Учетная запись привязана</span>
+                <br />
+                <button class="btn btn-success btn-sm" id="check_billing_access" data-check-target="{{ path("ajax_check_billing_access") }}"><img src="{{ asset('build/images/ajax-loader.gif') }}" style="display: none;"> Проверить привязку</button>
+            {% else %}
+                <i class="fas fa-circle text-danger"></i> Учетная запись не привязана
+                <br />
+            {% endif %}
+                <a href="https://bill.ellco.ru/subscriber/login.php?redirect_uri={{ url('get_billing_token', {redirect: app.request.attributes.get('_route')})|url_encode }}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Вы будете перенаправлены на страницу биллинга для авторизации."><i class="fas fa-id-badge"></i> Авторизоваться</a>
+                <br />
+                <!-- <input type="password" id="user_password" name="user[password]" aria-describedby="user_password_help" class="form-control">
+                <small id="user_password_help" class="form-text text-muted">Оставьте поле пустым, чтобы его не менять</small> -->
+            </div>
+        {% endif %}
+
+        <button class="btn btn-primary">Сохранить</button>
+
+        {{ form_end(form, {'render_rest' : false}) }}
+
+    </main>
+
+{% endblock %}

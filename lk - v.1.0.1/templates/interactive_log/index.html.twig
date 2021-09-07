@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Логи запросов{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(function() {
+            $(".params_toggler").click(function(e) {
+                var button = $(this);
+                if (button.attr('aria-expanded') === "false") {
+                    button.text("Скрыть");
+                } else  if (button.attr('aria-expanded') === "true") {
+                    button.text("Раскрыть");
+                }
+            });
+
+            $("#start_date").datetimepicker({
+                icons: {
+                    time: "far fa-clock"
+                },
+                locale: "ru",
+                useCurrent: false,
+                {% if start_date is not null %} date: "{{ start_date }}" {% endif %}
+            });
+
+            $("#end_date").datetimepicker({
+                icons: {
+                    time: "far fa-clock"
+                },
+                locale: "ru",
+                useCurrent: false,
+                {% if end_date is not null %} date: "{{ end_date }}" {% endif %}
+            });
+
+            $("#start_date").on("change.datetimepicker", function (e) {
+                $("#end_date").datetimepicker('minDate', e.date);
+            });
+
+            $("#end_date").on("change.datetimepicker", function (e) {
+                $("#start_date").datetimepicker('maxDate', e.date);
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+
+<main>
+    <h1>Логи запросов</h1>
+    <div class="row">
+        <form method="get" class="form-inline mb-2">
+            <div class="form-group position-relative">
+                <input class="form-control form-control-sm datetimepicker-input" type="text" name="start_date" id="start_date" data-toggle="datetimepicker" data-target="#start_date" autocomplete="off" placeholder="С">
+            </div>
+            <div class="form-group position-relative">
+                <input class="form-control form-control-sm datetimepicker-input ml-2" type="text" name="end_date" id="end_date" data-toggle="datetimepicker" data-target="#end_date" autocomplete="off" placeholder="До">
+            </div>
+            <div class="form-group">
+                <input class="form-control form-control-sm ml-2" type="text" name="url" placeholder="URL" value="{{ url }}">
+            </div>
+            <div class="form-group">
+                <input class="form-control form-control-sm ml-2" type="text" name="initiator" placeholder="Инициатор" value="{{ initiator }}">
+            </div>
+            <div class="form-group">
+                <input class="form-control form-control-sm ml-2" type="text" name="controller" placeholder="Контроллер" value="{{ controller }}">
+            </div>
+            <div class="form-group">
+                <input class="form-control form-control-sm ml-2" type="text" name="method" placeholder="Метод" value="{{ method }}">
+            </div>
+            <div class="form-group">
+                <input class="form-control form-control-sm ml-2" type="text" name="message" placeholder="Сообщение" value="{{ message }}">
+            </div>
+            <button type="submit" class="btn btn-primary ml-2">Поиск</button>
+            <a href="{{ path("interactive_log") }}" class="btn btn-secondary ml-2">Сброс</a>
+        </form>
+    </div>
+    <div class="row justify-content-md-end">
+        <div class="pagerfanta">
+            {{ pagerfanta(log, 'twitter_bootstrap4') }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Время</th>
+                        <th>URL</th>
+                        <th>Инициатор</th>
+                        <th>Контроллер</th>
+                        <th>Метод</th>
+                        <th>Параметры запроса</th>
+                        <th>IP клиента</th>
+                        <th>Сообщение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log_record in log %}
+                        <tr>
+                            <td>{{ log_record.time|date("d.m.Y H:i:s") }}</td>
+                            <td style="word-break: break-all; width: 15%;">{{ log_record.url|default("-")  }}</td>
+                            <td>
+                                {% if log_record.initiator is not null  %}
+                                    <a href="{{ path("user_show", {id: log_record.initiator.id}) }}" target="_blank">{{ log_record.initiator.username }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ log_record.controller|default("-")  }}</td>
+                            <td>{{ log_record.method|default("-") }}</td>
+                            <td style="width: 30%;">
+                                {% if log_record.requestParams is not null %}
+                                    <p>
+                                        <a class="params_toggler" data-toggle="collapse" href="#requestParams{{ log_record.id }}" role="button" aria-expanded="false" aria-controls="requestParams{{ log_record.id }}">
+                                            Раскрыть
+                                        </a>
+                                    </p>
+                                    <div class="collapse" id="requestParams{{ log_record.id }}">
+                                        <pre>{{ log_record.requestParams }}</pre>
+                                    </div>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ log_record.ipAddresses|join(', ') }}</td>
+                            <td style="width: 20%;">{{ log_record.message|default("-") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row justify-content-md-end">
+        <div class="pagerfanta">
+            {{ pagerfanta(log, 'twitter_bootstrap4') }}
+        </div>
+    </div>
+</main>
+{% endblock %}

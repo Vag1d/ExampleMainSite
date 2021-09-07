@@ -1,0 +1,166 @@
+{% if qoe_data is defined and qoe_data is not null %}
+
+    <script>
+        var options = {
+          chart: {
+            type: 'line',
+            height: '400px'
+          },
+          series: [{
+              name: 'Плотность',
+              data: [
+                  {% set last_axisX = 0 %}
+                  {% set min_axisY = 0 %}
+                  {% set max_axisY = 0 %}
+                  {% for qoe_axis in qoe_data.qoeGraph %}
+                    [{{ qoe_axis['x'] }}, {{ qoe_axis['y'] }}],
+                    {% set last_axisX = qoe_axis['x'] %}
+                    {% set min_axisY = min(qoe_axis['y'], min_axisY) %}
+                    {% set max_axisY = max(qoe_axis['y'], max_axisY) %}
+                  {% endfor %}
+              ]
+          }],
+          xaxis: {
+              name: 'RTT',
+              labels: {
+                  formatter: function (value) {
+                      return value.toFixed(1);
+                  }
+              },
+              min: 0,
+              max: {{ last_axisX + (qoe_data.qoeGraph[0]['x'] * 0.05) }},
+              title: {
+                  'text': 'RTT',
+                  'style': {
+                      'fontSize': '16px',
+                  }
+              },
+          },
+          yaxis: {
+              name: 'Плотность',
+              labels: {
+                  formatter: function (value) {
+                      return value.toFixed(3);
+                  }
+              },
+              min: {{ min_axisY * 0.95 }},
+              max: {{ max_axisY * 1.05 }}
+          },
+          markers: {
+              size: 5,
+          },
+          title: {
+              text: 'Плотность вероятности RTT',
+              align: 'center',
+              style: {
+                  fontSize: '20px',
+              }
+          },
+        }
+
+        var chart = new ApexCharts($("#qoe_graph").get(0), options);
+
+        chart.render();
+    </script>
+    <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <tbody>
+        <tr>
+            <td>Средний RTT</td>
+            {% if qoe_data.averageRtt < 5 %}
+            <td class="p-3 mb-2 bg-success text-white"> {{ qoe_data.averageRtt }} </td>
+            {% elseif qoe_data.averageRtt < 15 %}
+            <td class="p-3 mb-2 bg-warning text-dark"> {{ qoe_data.averageRtt }} </td>
+            {% else %}
+            <td class="p-3 mb-2 bg-danger text-white"> {{ qoe_data.averageRtt }} </td>
+            {% endif %}
+
+        </tr>
+        <tr>
+            <td>Медианный RTT</td>
+            {% if qoe_data.medianRtt < 5 %}
+                <td class="p-3 mb-2 bg-success text-white"> {{ qoe_data.medianRtt }} </td>
+            {% elseif qoe_data.averageRtt < 15 %}
+                <td class="p-3 mb-2 bg-warning text-dark"> {{ qoe_data.medianRtt }} </td>
+            {% else %}
+                <td class="p-3 mb-2 bg-danger text-white"> {{ qoe_data.medianRtt }} </td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td>Количество TCP-сессий</td>
+            <td> {{ qoe_data.totalSessions }} </td>
+        </tr>
+        <tr>
+            <td>Количество сессий с RTT более 5 мс</td>
+            <td> {{ qoe_data.longSessions }} </td>
+        </tr>
+        <table class="table table-responsive table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th class="th-sm">№</th>
+                <th class="th-sm"> IP </th>
+                <th class="th-sm"> Дата </th>
+                <th class="th-sm"> Коммутатор агрегации </th>
+                <th class="th-sm"> CRC ошибки  </th>
+                <th class="th-sm"> Договор </th>
+                <th class="th-sm"> Коммутатор доступа </th>
+                <th class="th-sm"> Порт коммутатора </th>
+                <th class="th-sm"> Коммутатор (из radius) </th>
+                <th class="th-sm"> Район (из radius) </th>
+                <th class="th-sm"> ОКАТО (из radius) </th>
+                <th class="th-sm"> Порт (из radius) </th>
+                <th class="th-sm"> Маршрутизатор </th>
+                <th class="th-sm"> IP коммутатора	 </th>
+
+                <th class="th-sm"> Среднее значение RTT </th>
+                <th class="th-sm"> Количество соединений </th>
+                <th class="th-sm"> Неотвеченные соединения </th>
+                <th class="th-sm"> Пакетов на сессию </th>
+                <th class="th-sm"> RX-ретрансмиты % </th>
+                <th class="th-sm"> TX-ретрансмиты % (среднее) </th>
+                <th class="th-sm"> ТX-ретрансмиты % (медианное) </th>
+                <th class="th-sm"> Медианное значение RTT </th>
+                <th class="th-sm"> Ширина разброса RTT </th>
+                <th class="th-sm"> Значение TCP fingerprint </th>
+            </thead>
+            <tbody>
+                {% set qoe_table_data_i = 1 %}
+                {% for qoe_table_data_element in qoe_data.qoeTableData %}
+                    <tr>
+                        <td>{{ qoe_table_data_i }}</td>
+                        <td> {{ qoe_table_data_element.count_ip|default('-') }}               </td>
+                        <td> {{ qoe_table_data_element.min_time|date('d.m.Y H:i')|default('-') }}
+                            - {{ qoe_table_data_element.max_time|date('d.m.Y H:i')|default('-') }} </td>
+                        <td> {{ qoe_table_data_element.agg|default('-') }}                    </td>
+                        <td> {{ qoe_table_data_element.crc|default('-') }}                    </td>
+                        <td> {{ qoe_table_data_element.num_contract|default('-') }}           </td>
+                        <td> {{ qoe_table_data_element.okato|default('-') }}                  </td>
+                        <td> {{ qoe_table_data_element.port|default('-') }}                   </td>
+                        <td> {{ qoe_table_data_element.radius_switch_okato|default('-') }}    </td>
+                        <td> {{ qoe_table_data_element.radius_switch_district |default('-')}} </td>
+                        <td> {{ qoe_table_data_element.radius_switch|default('-') }}          </td>
+                        <td> {{ qoe_table_data_element.radius_switch_port|default('-') }}     </td>
+                        <td> {{ qoe_table_data_element.router|default('-') }}                 </td>
+                        <td> {{ qoe_table_data_element.switch|default('-') }}                 </td>
+                        <td> {{ qoe_table_data_element.rtt_avg|default('-') }}                </td>
+                        <td> {{ qoe_table_data_element.session_count|default('-') }}          </td>
+                        <td> {{ qoe_table_data_element.empty_ses|default('-') }}              </td>
+                        <td> {{ qoe_table_data_element.pkt_per_ses|default('-') }}            </td>
+                        <td> {{ qoe_table_data_element.rx_retr_percent|default('-') }}        </td>
+                        <td> {{ qoe_table_data_element.tx_retr_percent|default('-') }}        </td>
+                        <td> {{ qoe_table_data_element.tx_retr_quantile|default('-') }}       </td>
+                        <td> {{ qoe_table_data_element.median_rtt|default('-') }}             </td>
+                        <td> {{ qoe_table_data_element.avg_rtt_width|default('-') }}          </td>
+                        <td> {{ qoe_table_data_element.fp_count|default('-') }}               </td>
+                    </tr>
+                    {% set qoe_table_data_i = qoe_table_data_i + 1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+        </tbody>
+    </table>
+{% else %}
+    <b>{{ qoe_error.message }} {% if qoe_error.error is defined %}(Код ошибки: {{ qoe_error.error }}){% endif %}</b>
+{% endif %}
+{% if qoe_data.qoeGraph is defined and qoe_data.qoeGraph is not null %}
+    <div id="qoe_graph"></div>
+{% endif %}

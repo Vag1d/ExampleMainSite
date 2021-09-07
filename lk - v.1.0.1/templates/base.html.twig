@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="https://raw.githubusercontent.com/dukei/any-balance-providers/9a275900b25bed8213310ed5289d5d3d1a9189f7/providers/ab-internet-ellcom/icon.png">
+
+    <title>{% block title %}Главная{% endblock %}</title>
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+        <meta charset="utf-8">
+</head>
+
+<body class="fixed-sn mdb-skin-custom" data-spy="scroll" data-target="#scrollspy" data-offset="15">
+
+    <div class="wrapper">
+        <nav id="sidebar" class="toggled {{ app.request.cookies.get('sidebar_collapsed') == 'true' ? 'active' : '' }}"><div class='sidebar-fixed'>
+            <div class="sidebar-header">
+                <h3 class='full'>Ellco</h3>
+                <h3 class='short'>E</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li>
+                    <a href="{{ path('index') }}" {% if app.request.get('_route') starts with 'index' %} class="active" {% endif %}>
+                        <i class="fas fa-home"></i>
+                        <span>Главная</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('abon_index') }}" {% if app.request.get('_route') starts with 'abon_index' %} class="active" {% endif %}>
+                        <i class="fas fa-address-card"></i>
+                        <span>Поиск абонентов</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('changelogs') }}" {% if app.request.get('_route') starts with 'changelogs' %} class="active" {% endif %}>
+                        <i class="fas fa-code-branch ml-1 mr-1"></i>
+                        <span>Список изменений</span>
+                    </a>
+                </li>
+                {% if is_granted('ROLE_SUPER_ADMIN') %}
+                    <li>
+                        <a href="{{ path('interactive_log') }}" {% if app.request.get('_route') starts with 'interactive_log' %} class="active" {% endif %}>
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Логи запросов</span>
+                        </a>
+                    </li>
+                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                    <li>
+                        <a href="{{ path('user_index') }}" {% if app.request.get('_route') starts with 'user_index' %} class="active" {% endif %}>
+                            <i class="fas fa-users"></i>
+                            <span>Пользователи</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a class="sidebar-collapse">
+                            <i class='opened'>&lt;</i>
+                            <i class='collapsed'>&gt;</i>
+                            <span>Свернуть</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+        </div></nav>
+
+        <div id="content">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+
+                    <button type="button" class="btn btn-info sidebar-collapse" id="mobileSidebarToggle">
+                        <i class="fas fa-align-left"></i> Меню
+                    </button>
+
+                </div>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    {% if is_granted('ROLE_USER') %}
+
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" id="help"><i class="fas fa-question-circle"></i></a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ app.user.username }}
+                                </a>
+                                <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
+                                <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
+                                   <a class="dropdown-item" style="color: #0d0d0d" href="{{ path('self_edit') }}">Настройки</a>
+                                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                        <a class="dropdown-item" style="color: #0d0d0d"  href="{{ path('user_index') }}">Управление пользователями</a>
+                                    {% endif %}
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" style="color: #0d0d0d" href="{{ path('logout') }}">Выход</a>
+                                </div>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </nav>
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+</body>
+</html>

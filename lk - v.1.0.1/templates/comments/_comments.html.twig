@@ -1,0 +1,79 @@
+{% if offset == 0 %}
+    <div id="comments_box">
+        {% if comments is defined and comments is not null and comments|length > 0 %}
+            {% for comment in comments|slice(0, 10) %}
+                {% include 'comments/_comment.html.twig' %}
+            {% endfor %}
+            {% if comments|length > 10 %}<button type="button" class="btn btn-info" id="comments_more" offset="{{ offset }}">Загрузить еще</button>{% endif %}
+        {% else %}
+            <b>Нет комментариев!</b>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="comment">Добавить комментарий:</label>
+      <textarea class="form-control" rows="5" id="comment"></textarea>
+      <input type="hidden" id="comment_token" value="{{ csrf_token('add-comment') }}"/>
+      <small id="commentHelp" class="form-text text-muted">Вы авторизованы как {{ user.username }}.</small>
+      <button type="submit" class="btn btn-secondary" id="comment_send" token="{{ csrf_token('add-comment' ~ num_contract) }}">Отправить</button>
+    </div>
+
+    <script>
+        $(function(){
+            $('#comment_send').click(function(){
+                var comment_text = $("#comment").val();
+                if (comment_text !== '') {
+                var comment_button = $(this);
+                    comment_button.attr('disabled', 'disabled').after('<img id="comments_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}">');
+                    var commentTimer = Date.now();
+                    $("#comment").val('');
+                    loadService("{{ path('ajax_comment_add') }}", {"num_contract" : "{{ num_contract }}", "comment" : comment_text, "token" : comment_button.attr('token')}, function (data) { // Add comment
+                        $('#comments_ajax_icon').remove();
+                        comment_button.removeAttr('disabled');
+                        $(document).ready(function() {
+                            $("#comments_data").children('p').first().remove();
+                            $("#comments_data").prepend('<p class="font-italic"><small>Добавлено за ' + (Date.now() - commentTimer) / 1000 + ' секунд.</small></p>');
+                            $("#comments_box").prepend(data.content);
+                            $("#comments_more").attr('offset', parseInt($("#comments_more").attr('offset')) + 1);
+                        });
+                    });
+                }
+            });
+
+            $(".comment-delete").click(function(){
+                var deleteTimer = Date.now();
+                var delete_button = $(this);
+                delete_button.attr('disabled', 'disabled').after('<img class="comments_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}">');
+                loadService("{{ path('ajax_comment_remove') }}", {"num_contract" : {{ num_contract }}, "comment_id" : delete_button.attr("comment_id"), "token" : delete_button.attr("token"), "_method" : "DELETE"}, function (data) { // Delete comment
+                    if (data.confirm) {
+                        delete_button.parent().html("<p>Комментарий удален. Выполнено за " + (Date.now() - deleteTimer) / 1000 + " сек.</p>").parent().delay(5000).fadeOut(200);
+                    } else {
+                        delete_button.removeAttr('disabled');
+                        delete_button.next().remove();
+                        if (data.message !== undefined) {
+                            delete_button.after("<p class='font-italic'>Не удалось удалить комментарий. Причина: " + data.message + "</p>").next().delay(5000).fadeOut(200);
+                        } else {
+                            delete_button.after("<p class='font-italic'>Не удалось удалить комментарий.</p>").next().delay(5000).fadeOut(200);
+                        }
+                    }
+                });
+            });
+
+            $("#comments_box").on('click', '#comments_more', function(){
+                var commentsTimer = Date.now();
+                var comments_more_button = $(this);
+                comments_more_button.attr('disabled', 'disabled').after('<img class="comments_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}">');
+                loadService("{{ path('ajax_comments') }}", {"num_contract" : {{ num_contract }}, "offset" : parseInt(comments_more_button.attr('offset')) + 10}, function (data) { // Load more comments
+                    comments_more_button.next().remove();
+                    comments_more_button.remove();
+                    $("#comments_box").append(data.content).append($('<p class="font-italic"><small>Выполнено за ' + (Date.now() - commentsTimer) / 1000 + ' секунд.</small></p>').delay(5000).fadeOut(200));
+                });
+            });
+        });
+    </script>
+{% else %}
+    {% for comment in comments|slice(0, 10) %}
+        {% include 'comments/_comment.html.twig' %}
+    {% endfor %}
+    {% if comments|length > 10 %}<button type="button" class="btn btn-info" id="comments_more" offset="{{ offset }}">Загрузить еще</button>{% endif %}
+{% endif %}

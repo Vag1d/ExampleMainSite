@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Список пользователей{% endblock %}
+
+{% block body %}
+    <main>
+        <h1>Список пользователей</h1>
+
+        <a href="{{ path('index') }}">На главную</a>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Логин</th>
+                <th>Роли</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.roles|join(', ') }}</td>
+                    <td>
+                        <a href="{{ path('user_show', {'id': user.id}) }}">показать</a> |
+                        <a href="{{ path('user_edit', {'id': user.id}) }}">изменить</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">Ничего не найдено!</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+            <a class="btn btn-primary" href="{{ path('user_new') }}">
+                <i class="fas fa-user-plus"></i> Создать нового
+            </a>
+    </main>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    {{ encore_entry_script_tags('app') }}
+    <script>
+        $(function () {
+
+            var options = {
+              chart: {
+                type: 'line',
+                height: '400px'
+              },
+              series: [{
+                  name: 'Плотность',
+                  data: [
+                      [3.0, 3.3333333333333],
+                      [3.2, 50.0],
+                      [3.6, 25.0],
+                      [4.0, 25.0],
+                      [4.4, 25.0],
+                      [5.0, 16.666666666667],
+                      [6.0, 10.0],
+                      [8.0, 5.0],
+                      [17.6, 1.0416666666667]
+                  ]
+              }],
+              xaxis: {
+                  name: 'RTT',
+                  labels: {
+                      formatter: function (value) {
+                          return value.toFixed(3);
+                      }
+                  }
+              },
+              yaxis: {
+                  labels: {
+                      formatter: function (value) {
+                          return value.toFixed(3);
+                      }
+                  }
+              },
+              markers: {
+                  size: 5,
+              }
+            }
+
+            var chart = new ApexCharts($("#chartContainer").get(0), options);
+
+            chart.render();
+
+            // var chart = new CanvasJS.Chart("chartContainer", {
+            //     title: {
+            //         text: "Плотность вероятности RTT"
+            //     },
+            //     axisX: {
+            //         title: "RTT"
+            //     },
+            //     axisY: {
+            //         title: "Плотность"
+            //     },
+            //     toolTip: {
+            //         shared: true
+            //     },
+            //     legend: {
+            //         cursor: "pointer",
+            //         verticalAlign: "top",
+            //         horizontalAlign: "center",
+            //         dockInsidePlotArea: true,
+            //         itemclick: toogleDataSeries
+            //     },
+            //     data: [{
+            //         type:"line",
+            //         name: "Плотность",
+            //         // showInLegend: true,
+            //         dataPoints: [
+            //             { x: 3.0, y: 3.3333333333333 },
+            //             { x: 3.2, y: 50.0 },
+            //             { x: 3.6, y: 25.0 },
+            //             { x: 4.0, y: 25.0 },
+            //             { x: 4.4, y: 25.0 },
+            //             { x: 5.0, y: 16.666666666667 },
+            //             { x: 6.0, y: 10.0 },
+            //             { x: 8.0, y: 5.0 },
+            //             { x: 17.6, y: 1.0416666666667 },
+            //         ]
+            //     },]
+            // });
+            // chart.render();
+            //
+            // function toogleDataSeries(e){
+            //     if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            //         e.dataSeries.visible = false;
+            //     } else{
+            //         e.dataSeries.visible = true;
+            //     }
+            //     chart.render();
+            // }
+
+        });
+    </script>
+</head>
+<body>
+<div id="chartContainer" style="max-height: 270px; width: 80%;"></div>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+</html>

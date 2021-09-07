@@ -1,0 +1,190 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    {% if num_contract is not null %}
+        <script>
+            $(document).ready(function() {
+                var globalTimer = Date.now();
+                loadService("{{ path('ajax_billing') }}", {"num_contract" : "{{ num_contract }}"}, function (data) { //Billing
+                    $(document).ready(function() {
+                        $('#billing_ajax_icon').remove();
+                        $("#billing_info").html(data.content).prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                    });
+                    if (data.not_found === undefined) {
+                        globalTimer = Date.now();
+                        if (data.serviceList !== undefined) {
+                            for (let service of data.serviceList) {
+                                if (service.status === 0) {
+                                    var search_ocato = service.title.match(/\d{3}\.\d{3}\.\d{3}\.\d{3}/);
+                                    if (search_ocato === null) {
+                                        var search_ocato = service.identifier.match(/\d{3}\.\d{3}\.\d{3}\.\d{3}/);
+                                    }
+                                    if (search_ocato !== null) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if (search_ocato !== null) {
+                                loadService("{{ path('ajax_zabbix') }}", {"ocato" : search_ocato[0]}, function (data) { //Zabbix
+                                    $(document).ready(function() {
+                                        $('#zabbix_ajax_icon').remove();
+                                        $("#zabbix_data").html(data.content).prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                                    });
+                                });
+                            } else {
+                                $(document).ready(function() {
+                                    $('#zabbix_ajax_icon').remove();
+                                    $("#zabbix_data").html("<p>Не удалось найти окато из биллинга</p>").prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                                });
+                            }
+                        }
+                        loadService("{{ path('ajax_qoe') }}", {"num_contract" : "{{ num_contract }}"}, function (data) { // QoE
+                            $(document).ready(function() {
+                                $('#qoe_ajax_icon').remove();
+                                $("#qoe_data").html(data.content).prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                            });
+                        });
+                        loadService("{{ path('ajax_cacti') }}", {"graphid" : 444}, function (data) { // Cacti
+                            $('#cacti_ajax_icon').remove();
+                            $(document).ready(function() {
+                                $("#cacti_graph").html(data.content).prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                            });
+                        });
+                        loadService("{{ path('ajax_bitrix_tasks') }}", {"num_contract" : "{{ num_contract }}"}, function (data) { // Bitrix
+                            $('#bitrix_ajax_icon').remove();
+                            $(document).ready(function() {
+                                $("#bitrix_data").html(data.content).prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                            });
+                        });
+                        loadService("{{ path('ajax_comments') }}", {"num_contract" : "{{ num_contract }}"}, function (data) { // Cacti
+                            $('#comments_ajax_icon').remove();
+                            $(document).ready(function() {
+                                $("#comments_data").html(data.content).prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                            });
+                        });
+
+                        loadService("{{ path('ajax_acs') }}", {"num_contract" : "{{ num_contract }}"}, function (data) { // ACS
+                            $('#acs_ajax_icon').remove();
+                            $(document).ready(function() {
+                                $("#acs_data").html(data.content).prepend('<p class="font-italic"><small>Загружено за ' + (Date.now() - globalTimer) / 1000 + ' секунд.</small></p>');
+                            });
+                        });
+                    }  else {
+                        $('#zabbix_ajax_icon, #qoe_ajax_icon, #cacti_ajax_icon, #bitrix_ajax_icon, #acs_ajax_icon, #comments_ajax_icon').remove();
+                        $("#zabbix_data, #qoe_data, #cacti_graph, #bitrix_data, #acs_data, #comments_data").html("<p>Биллинг ничего не нашел</p>");
+                    }
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+
+{% block title %}Billing!{% endblock %}
+
+{% block body %}
+    <style>
+        button{
+            margin: -20px -50px;
+            position:relative;
+            top:50%;
+            left:50%;
+        }
+
+    </style>
+    <main>
+
+        <div class="container-fluid mt-2">
+
+            <!-- Main docs tabs -->
+            <div class="main-tabs-docs">
+
+                <div class="tab-content">
+                    <!--Overview-->
+                    <div class="tab-pane fade in show active" id="docsTabsOverview" role="tabpanel">
+                        <!--Grid row-->
+                        <div class="row">
+                            <!--Grid column: Content-->
+                            <div class="col-lg-10 col-md-12">
+                                <!--Section: Docs content-->
+                                <section class="documentation">
+                                    <!--Section: -->
+                                    <section id="r-editor">
+                                        <section class="p-1">
+
+                                            <div class="wrapper-editor">
+
+                                                    <form method="post">
+                                                        <input class="form-control pb-1 pt-2 mb-0" name="num_contract" value="{{ num_contract }}" placeholder="Номер договора">
+                                                        <button class="btn btn-info btn-rounded btn-sm waves-effect waves-light"> search</button>
+
+                                                    </form>
+
+                                                </div>
+                                            {% if num_contract is not null %}
+                                                <div class="example-wrapper">
+                                                    <h1 align="center">Billing <img id="billing_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}"></h1>
+                                                    <div id="billing_info"></div>
+                                                </div>
+                                                <div class="example-wrapper">
+                                                    <h1 align="center">QoE<img id="qoe_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}"></h1>
+                                                    <div id="qoe_data"></div>
+                                                </div>
+                                                <div class="example-wrapper">
+                                                    <h1 align="center">Zabbix <img id="zabbix_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}"></h1>
+                                                    <div id="zabbix_data"></div>
+                                                </div>
+                                                <div class="example-wrapper">
+                                                    <h1 align="center">Cacti <img id="cacti_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}"></h1>
+                                                    <div id="cacti_graph"></div>
+                                                </div>
+                                                <div class="example-wrapper">
+                                                    <h1 align="center">Bitrix <img id="bitrix_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}"></h1>
+                                                    <div id="bitrix_data"></div>
+                                                </div>
+                                                <div class="example-wrapper">
+                                                    <h1 align="center">ACS <img id="acs_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}"></h1>
+                                                    <div id="acs_data"></div>
+                                                </div>
+                                                <div class="example-wrapper">
+                                                    <h1 align="center">Комментарии <img id="comments_ajax_icon" src="{{ asset('build/images/ajax-loader.gif') }}"></h1>
+                                                    <div id="comments_data"></div>
+                                                </div>
+
+                                            {% endif %}
+                                        </section>
+                                    </section>
+                                </section>
+                                            </div>
+
+                                        </section>
+                                        <!--Section: Live preview-->
+
+                                        <!--Section: Code-->
+                                        <!--Section: Code-->
+
+                                    </section>
+                                    <!--/Section: -->
+
+                                    <!--/Section: -->                            </section>
+                                <!--Section: Docs content-->
+
+                            </div>
+
+                        </div>
+                        <!--Grid row-->
+
+                    </div>
+
+                </div>
+                <!--/.Examples-->
+            </div>
+
+        </div>
+
+        <!-- Main docs tabs -->
+        </div>
+
+    </main>
+{% endblock %}

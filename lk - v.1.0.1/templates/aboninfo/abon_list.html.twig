@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    {{ encore_entry_script_tags('abon_list') }}
+
+{% endblock %}
+
+{% block title %}Поиск абонента{% endblock %}
+
+{% block body %}
+
+    <main>
+        <div class="wrapper-editor" align="center">
+
+            <form method="get" id="search-form">
+                <div class="form-row">
+                    <div class="col">
+                        <label for="num_contract" class="sr-only">Номер договора, логин, окато, ФИО или контактный номер</label>
+                        <input type="text" class="form-control" name="num_contract" id="num_contract" placeholder="Номер договора, логин, окато, ФИО или контактный номер" value="{{ num_contract }}">
+                    </div>
+                    <div class="col-2 col-xl-1">
+                        <button type="submit" class="btn btn-primary mb-2 btn-block" id="search_submit">Искать</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+        <div class="row"><div class="col">
+            {% if abonList|length > 0 %}
+            <div class="table-responsive">
+                <table class="table" id="abon_list">
+                    <thead>
+                        <tr>
+                            <th>Номер договора</th>
+                            <th>ФИО</th>
+                            <th>Баланс</th>
+                            <th>Тариф</th>
+                            <th>Представитель</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for abonent in abonList %}
+                            <tr>
+                                <td><a href="{{ path("abon_index", {num_contract: abonent.title}) }}">{{ abonent.title }}</a></td>
+                                <td>{{ abonent.comment }}</td>
+                                <td>{% if abonent.balance > 100 %}
+                                        <i class="fas fa-circle text-success"></i>
+                                    {% elseif abonent.balance > 0 %}
+                                        <i class="fas fa-circle text-warning"></i>
+                                    {% else %}
+                                        <i class="fas fa-circle text-danger"></i>
+                                    {% endif %}{{ abonent.balance }}</td>
+                                <td>{{ abonent.tariffList[0]|default("?") }}</td>
+                                <td>{{ abonent.agent }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <h2>Ничего не найдено!</h2>
+            {% endif %}
+        </div></div>
+    </main>
+
+{% endblock %}

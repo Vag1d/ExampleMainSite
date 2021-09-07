@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+        <meta charset="utf-8">
+</head>
+
+<header>
+
+        <!-- Sidebar navigation -->
+        <div id="slide-out" class="side-nav sn-bg-4 mdb-sidenav fixed">
+            <ul class="custom-scrollbar list-unstyled" style="max-height:100vh; padding-bottom:90px">
+                <!-- Logo -->
+                <li class="logo-sn d-block waves-effect">
+                    <div class="text-center">
+                        <a class="pl-0" href="/"><img id="MDB-logo" src="https://raw.githubusercontent.com/dukei/any-balance-providers/9a275900b25bed8213310ed5289d5d3d1a9189f7/providers/ab-internet-ellcom/icon.png" alt="ELLCO Logo"></a>
+                    </div>
+                </li>
+                <!--/. Logo -->
+                <!--Search Form-->
+                <li>
+                    <div class="collapsible-body" > <ul class="sub-menu">
+                            <li id="menu-item-85133" class="menu-item menu-item-type-custom menu-item-object-custom  menu-item-85133"><a class="collapsible-header waves-effect" id="link-menu-item-85133"  href="{{ path('abon_index') }}">Search</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            <div class="sidenav-bg mask-strong"></div>
+        </div>
+        <!--/. Sidebar navigation -->
+        <!--/.SideNav-->
+
+        <!-- Navbar-->
+        <nav class="navbar fixed-top navbar-expand-md navbar-light white double-nav scrolling-navbar">
+            <!-- SideNav slide-out button -->
+            <div class="float-left">
+                <a href="#" data-activates="slide-out" class="button-collapse"><i class="fas fa-bars"></i><span class="sr-only" aria-hidden="true">Toggle side navigation</span></a>
+            </div>
+            <!-- Navbar links-->
+            {% if is_granted('ROLE_USER') %}
+
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ app.user.username }}
+                        </a>
+                        <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
+                        <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" style="color: #0d0d0d" href="{{ path('user_edit', {'id': app.user.id}) }}">Settings</a>
+                            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                <a class="dropdown-item" style="color: #0d0d0d"  href="{{ path('user_index') }}">Manage users</a>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" style="color: #0d0d0d" href="{{ path('logout') }}">Log Out</a>
+                        </div>
+                    </li>
+                </ul>
+            {% endif %}
+            <!--Navigation icons-->
+{#            <ul class="nav navbar-nav nav-flex-icons ml-auto">#}
+{#                {% if is_granted('ROLE_USER') %}#}
+{#                <a class="btn btn-info " href=" {{ path('logout') }}">Log Out {{ app.user.username }}#}
+{#                </a>#}
+
+{#                {% else %}#}
+{#                    <a class="btn btn-info btn-rounded btn-sm waves-effect waves-light" href=" {{ path('login') }}">Log In#}
+{#                        <i class="fas fa-sign-in-alt ml-2"></i>#}
+{#                    </a>#}
+{#                {% endif %}#}
+{#                <!-- Login / register -->#}
+
+{#            </ul>#}
+        </nav>
+        <!-- /.Navbar-->
+    </header>
+
+<body class="fixed-sn mdb-skin-custom" data-spy="scroll" data-target="#scrollspy" data-offset="15">
+{% block body %}{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+</body>
+</html>

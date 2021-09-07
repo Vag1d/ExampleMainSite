@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Новый пользователь{% endblock %}
+
+{% block body %}
+    <main>
+        <h1>Создание нового пользователя</h1>
+
+        {{ include('user/_form.html.twig') }}
+
+        <a href="{{ path('user_index') }}">Назад к списку пользователей</a>
+    </main>
+
+{% endblock %}

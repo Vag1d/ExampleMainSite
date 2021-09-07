@@ -1,0 +1,9 @@
+{% if cacti is defined and cacti is not null %}
+    <img src="data:image/{{ cacti.data.type }};base64,{{ cacti.data.image }}">
+{% else %}
+    {% if error is defined %}
+        <b>{{ error }}
+    {% else %}
+        <b>Ничего не найдено!</b>
+    {% endif %}
+{% endif %}
