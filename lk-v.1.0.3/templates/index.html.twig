@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+{{ parent() }}
+<script type="text/javascript">
+    $("#help").remove();
+</script>
+{% endblock %}
+
+{% block title %}Главная{% endblock %}
+
+{% block body %}
+    <main>
+        <h1>Главная</h1>
+
+        {% if is_granted('ROLE_USER') %}
+            <div class="row"><div class="col">
+                Вы вошли как <i>{{ app.user.username }}</i>.
+                <a href=" {{ path('logout') }}">Выйти</a>
+                <br />
+                {% if is_granted('ROLE_SUPER_ADMIN') %}
+                    <a href=" {{ path('user_index') }}">Управление пользователями</a>
+                {% endif %}
+            </div></div>
+            <div class="row"><div class="col">
+                <h2>Последние изменения</h2>
+                {% include 'changelog/_last_version_card.html.twig' %}
+            </div></div>
+
+        {% else %}
+            Вы не вошли
+            <a href=" {{ path('login') }}">Войти</a>
+        {% endif %}
+    </main>
+
+
+{% endblock %}
